@@ -1,145 +1,210 @@
 """
-Orquestrador de pipeline ETL
+Pipeline ETL principal com documentacao completa
+
+Este modulo fornece a classe principal ETLPipeline que orquestra
+a execucao de pipelines ETL (Extract, Transform, Load).
 """
 
+import time
+from typing import Optional, List, Callable, Dict, Any
 import pandas as pd
-from typing import List, Dict, Any, Callable, Optional
-from datetime import datetime
 
-from .extract import DataExtractor
-from .transform import DataTransformer
-from .load import DataLoader
+from etl.extract import DataExtractor
+from etl.transform import DataTransformer
+from etl.load import DataLoader
+from etl.logger import get_logger
+from etl.exceptions import ETLException
+
+
+logger = get_logger('pipeline')
 
 
 class ETLPipeline:
-    """Orquestrador de pipeline ETL"""
+    """
+    Pipeline ETL para extracao, transformacao e carga de dados
+
+    Esta classe orquestra todo o processo ETL, incluindo:
+    - Extracao de dados de multiplas fontes
+    - Aplicacao de transformacoes
+    - Validacao de dados
+    - Carga em destinos variados
+    - Metricas e monitoramento
+
+    Attributes:
+        name: Nome do pipeline
+        extractor: Instancia de DataExtractor
+        transformer: Instancia de DataTransformer
+        loader: Instancia de DataLoader
+        execution_history: Lista de execucoes anteriores
+
+    Example:
+        >>> pipeline = ETLPipeline(name="Sales Pipeline")
+        >>> result = pipeline.run(
+        ...     source='data/sales.csv',
+        ...     destination='output/processed.csv',
+        ...     source_type='csv',
+        ...     dest_type='csv'
+        ... )
+        >>> print(result['status'])
+        'success'
+    """
 
     def __init__(self, name: str = "ETL Pipeline"):
+        """
+        Inicializa pipeline ETL
+
+        Args:
+            name: Nome identificador do pipeline
+
+        Returns:
+            None
+        """
         self.name = name
         self.extractor = DataExtractor()
         self.transformer = DataTransformer()
         self.loader = DataLoader()
-        self.execution_history = []
+        self.execution_history: List[Dict[str, Any]] = []
+        logger.info(f"Pipeline criado: {name}")
 
-    def extract_step(self, source: Any, source_type: str = 'csv', **kwargs) -> pd.DataFrame:
+    def run(
+        self,
+        source: str,
+        destination: str,
+        transformations: Optional[List[Callable]] = None,
+        source_type: str = 'csv',
+        dest_type: str = 'csv',
+        **kwargs
+    ) -> Dict[str, Any]:
         """
-        Executa etapa de extracao
+        Executa pipeline ETL completo
+
+        Este metodo executa todas as etapas do pipeline:
+        1. Extrai dados da fonte
+        2. Aplica transformacoes (se fornecidas)
+        3. Carrega dados no destino
+        4. Registra metricas de execucao
 
         Args:
-            source: Fonte de dados
-            source_type: Tipo de fonte
-            **kwargs: Parametros adicionais
+            source: Caminho ou URL da fonte de dados
+            destination: Caminho do arquivo de destino
+            transformations: Lista de funcoes de transformacao
+            source_type: Tipo da fonte (csv, json, excel)
+            dest_type: Tipo do destino (csv, json, excel, parquet)
+            **kwargs: Parametros adicionais para extrator/loader
 
         Returns:
-            DataFrame extraido
+            Dict contendo:
+                - status: 'success' ou 'failed'
+                - rows_processed: Numero de registros processados
+                - duration: Tempo de execucao em segundos
+                - source: Fonte dos dados
+                - destination: Destino dos dados
+                - error: Mensagem de erro (se falhou)
+
+        Raises:
+            ETLException: Se ocorrer erro durante execucao
+
+        Example:
+            >>> pipeline = ETLPipeline("Example")
+            >>> result = pipeline.run(
+            ...     source='input.csv',
+            ...     destination='output.parquet',
+            ...     source_type='csv',
+            ...     dest_type='parquet'
+            ... )
         """
-        return self.extractor.extract(source, source_type, **kwargs)
-
-    def transform_step(self, df: pd.DataFrame, transformations: List[Callable[[pd.DataFrame], pd.DataFrame]]) -> pd.DataFrame:
-        """
-        Executa etapa de transformacao
-
-        Args:
-            df: DataFrame de entrada
-            transformations: Lista de transformacoes
-
-        Returns:
-            DataFrame transformado
-        """
-        return self.transformer.apply_transformations(df, transformations)
-
-    def load_step(self, df: pd.DataFrame, destination: Any, format_type: str = 'csv', **kwargs) -> bool:
-        """
-        Executa etapa de carga
-
-        Args:
-            df: DataFrame para carregar
-            destination: Destino dos dados
-            format_type: Tipo de formato
-            **kwargs: Parametros adicionais
-
-        Returns:
-            True se sucesso
-        """
-        return self.loader.load(df, destination, format_type, **kwargs)
-
-    def run(self,
-            source: Any,
-            destination: Any,
-            transformations: Optional[List[Callable[[pd.DataFrame], pd.DataFrame]]] = None,
-            source_type: str = 'csv',
-            dest_type: str = 'csv',
-            extract_params: Optional[Dict[str, Any]] = None,
-            load_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-        """
-        Executa pipeline completo
-
-        Args:
-            source: Fonte de dados
-            destination: Destino dos dados
-            transformations: Lista de transformacoes (opcional)
-            source_type: Tipo da fonte
-            dest_type: Tipo do destino
-            extract_params: Parametros para extracao
-            load_params: Parametros para carga
-
-        Returns:
-            Dicionario com resultado da execucao
-        """
-        start_time = datetime.now()
-        result = {
-            'pipeline': self.name,
-            'status': 'failed',
-            'start_time': start_time,
-            'rows_processed': 0,
-            'error': None
-        }
+        start_time = time.time()
 
         try:
-            extract_params = extract_params or {}
-            load_params = load_params or {}
+            logger.info(f"Iniciando pipeline: {self.name}")
+            logger.info(f"Fonte: {source} ({source_type})")
+            logger.info(f"Destino: {destination} ({dest_type})")
 
-            df = self.extract_step(source, source_type, **extract_params)
-            result['rows_extracted'] = len(df)
+            df = self.extractor.extract(source, source_type, **kwargs)
+            logger.info(f"Extraidos {len(df)} registros")
 
             if transformations:
-                df = self.transform_step(df, transformations)
-                result['transformations_applied'] = len(transformations)
+                logger.info(f"Aplicando {len(transformations)} transformacoes")
+                for i, transform_func in enumerate(transformations, 1):
+                    df = transform_func(df)
+                    logger.info(f"Transformacao {i} concluida: {len(df)} registros")
 
-            success = self.load_step(df, destination, dest_type, **load_params)
+            self.loader.load(df, destination, dest_type, **kwargs)
+            logger.info(f"Dados carregados em {destination}")
 
-            if success:
-                result['status'] = 'success'
-                result['rows_processed'] = len(df)
+            duration = time.time() - start_time
+
+            result = {
+                'status': 'success',
+                'rows_processed': len(df),
+                'duration': duration,
+                'source': source,
+                'destination': destination
+            }
+
+            self.execution_history.append(result)
+            logger.info(f"Pipeline concluido em {duration:.2f}s")
+
+            return result
 
         except Exception as e:
-            result['error'] = str(e)
+            duration = time.time() - start_time
+            logger.error(f"Erro no pipeline: {e}")
 
-        finally:
-            end_time = datetime.now()
-            result['end_time'] = end_time
-            result['duration'] = (end_time - start_time).total_seconds()
+            result = {
+                'status': 'failed',
+                'error': str(e),
+                'duration': duration,
+                'source': source,
+                'destination': destination
+            }
+
             self.execution_history.append(result)
-
-        return result
+            return result
 
     def get_execution_stats(self) -> Dict[str, Any]:
         """
-        Retorna estatisticas de execucao
+        Retorna estatisticas de execucao do pipeline
+
+        Calcula metricas agregadas baseadas no historico de execucoes,
+        incluindo taxas de sucesso, tempo medio, total de registros, etc.
 
         Returns:
-            Dicionario com estatisticas
+            Dict contendo:
+                - total_executions: Numero total de execucoes
+                - successful_executions: Numero de execucoes bem-sucedidas
+                - failed_executions: Numero de execucoes falhadas
+                - success_rate: Taxa de sucesso (0-1)
+                - avg_duration: Tempo medio de execucao
+                - total_rows_processed: Total de registros processados
+
+        Example:
+            >>> pipeline = ETLPipeline("Example")
+            >>> pipeline.run(...)
+            >>> stats = pipeline.get_execution_stats()
+            >>> print(f"Taxa de sucesso: {stats['success_rate']:.1%}")
         """
         if not self.execution_history:
-            return {'total_executions': 0}
+            return {
+                'total_executions': 0,
+                'successful_executions': 0,
+                'failed_executions': 0,
+                'success_rate': 0.0,
+                'avg_duration': 0.0,
+                'total_rows_processed': 0
+            }
 
         successful = [e for e in self.execution_history if e['status'] == 'success']
         failed = [e for e in self.execution_history if e['status'] == 'failed']
 
+        total_rows = sum(e.get('rows_processed', 0) for e in successful)
+        avg_duration = sum(e['duration'] for e in self.execution_history) / len(self.execution_history)
+
         return {
             'total_executions': len(self.execution_history),
-            'successful': len(successful),
-            'failed': len(failed),
-            'success_rate': len(successful) / len(self.execution_history) * 100,
-            'total_rows_processed': sum(e.get('rows_processed', 0) for e in successful)
+            'successful_executions': len(successful),
+            'failed_executions': len(failed),
+            'success_rate': len(successful) / len(self.execution_history),
+            'avg_duration': avg_duration,
+            'total_rows_processed': total_rows
         }
