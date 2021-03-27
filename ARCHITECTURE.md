@@ -1,114 +1,261 @@
-# Arquitetura do Pipeline ETL
+# Arquitetura do Sistema ETL
 
-## Visão Geral
+## Visao Geral
 
-O pipeline ETL é composto por módulos independentes que trabalham em conjunto para extrair, transformar e carregar dados.
+Sistema ETL modular e extensivel para processamento de dados em larga escala.
 
-## Componentes
+## Componentes Principais
 
-### 1. Extract (Extração)
+### 1. Conectores (etl/connectors.py)
 
-Responsável por extrair dados de múltiplas fontes:
-- Arquivos CSV
-- Arquivos JSON
-- Arquivos Excel
-- Extensível para outras fontes (APIs, bancos de dados)
+Responsavel por abstrair diferentes fontes de dados.
 
-### 2. Transform (Transformação)
+**Classes:**
+- `BaseConnector`: Interface base para conectores
+- `FileConnector`: Conectores para arquivos (CSV, JSON, Parquet, Excel)
+- `ConnectorFactory`: Factory pattern para criacao de conectores
 
-Aplicação de regras de transformação:
-- Remoção de duplicatas
-- Tratamento de nulos
-- Filtragem de dados
-- Cálculos e agregações
-- Renomeação de colunas
+**Fluxo:**
+```
+Fonte de Dados -> Conector -> DataFrame
+```
 
-### 3. Load (Carga)
+### 2. Processadores (etl/processors.py)
 
-Persistência de dados em diversos formatos:
-- CSV
+Processamento e transformacao de dados.
+
+**Classes:**
+- `BaseProcessor`: Interface base
+- `CleaningProcessor`: Limpeza de dados (duplicatas, nulos)
+- `TransformationProcessor`: Transformacoes customizadas
+- `ProcessorChain`: Encadeamento de processadores
+
+**Padrao Chain of Responsibility:**
+```
+DataFrame -> Processor1 -> Processor2 -> ... -> DataFrame processado
+```
+
+### 3. Orquestrador (etl/orchestrator.py)
+
+Coordena execucao do pipeline completo.
+
+**Responsabilidades:**
+- Gerenciar fluxo Extract-Transform-Load
+- Coordenar processadores
+- Controlar transacoes
+- Logging e metricas
+
+### 4. Banco de Dados (etl/database.py)
+
+Conectores para bancos relacionais.
+
+**Suporte:**
+- PostgreSQL (psycopg2)
+- MySQL (pymysql)
+- Context managers para transacoes
+
+### 5. Carga Incremental (etl/incremental.py)
+
+Gerenciamento de cargas incrementais e CDC.
+
+**Features:**
+- Rastreamento de estado
+- Deteccao de mudancas (inserts, updates, deletes)
+- Persistencia de checkpoints
+
+### 6. Qualidade de Dados (etl/quality.py)
+
+Validacao e garantia de qualidade.
+
+**Validacoes:**
+- Completude
+- Unicidade
+- Range de valores
+- Padroes (regex)
+- Checks customizados
+
+### 7. Schema (etl/schema.py)
+
+Validacao e inferencia de schemas.
+
+**Capacidades:**
+- Definicao de schemas tipados
+- Validacao de estrutura
+- Inferencia automatica
+- Conversao de/para JSON
+
+### 8. Processamento Paralelo (etl/parallel.py)
+
+Processamento otimizado multi-core.
+
+**Estrategias:**
+- Divisao em chunks
+- ProcessPoolExecutor
+- ThreadPoolExecutor
+- Batch processing
+
+### 9. Data Lineage (etl/lineage.py)
+
+Rastreamento de linhagem de dados.
+
+**Recursos:**
+- Tracking de origem e destino
+- Registro de transformacoes
+- Exportacao para JSON
+- Visualizacao de grafo
+
+### 10. Checkpoint e Recuperacao (etl/checkpoint.py)
+
+Sistema de recuperacao de falhas.
+
+**Funcionalidades:**
+- Salvamento de estado intermediario
+- Recuperacao de execucao
+- Cleanup de checkpoints antigos
+- Decorators para steps
+
+### 11. Export (etl/export.py)
+
+Exportacao para multiplos formatos.
+
+**Formatos:**
+- CSV (com compressao)
+- Parquet (com particoes)
 - JSON
 - Excel
-- Parquet
+- HTML
+- Markdown
 
-### 4. Pipeline Orchestrator
+### 12. Otimizacao de Batch (etl/batch_optimizer.py)
 
-Coordena a execução das etapas ETL:
-- Execução sequencial Extract -> Transform -> Load
-- Rastreamento de execução
-- Estatísticas de performance
+Otimizacoes avancadas de processamento.
 
-### 5. Logger
+**Tecnicas:**
+- Batch size adaptativo
+- Memoria eficiente
+- Streaming processing
+- Paralelizacao de batches
 
-Sistema de logging estruturado:
-- Logs rotativos
-- Níveis de log configuráveis
-- Logs específicos por etapa
-- Saída para arquivo e console
-
-### 6. Validators
-
-Sistema de validação de dados:
-- Validação de valores nulos
-- Validação de unicidade
-- Validação de tipos de dados
-- Validação de ranges
-- Validações customizadas
-
-### 7. Error Handler
-
-Tratamento centralizado de erros:
-- Captura e logging de erros
-- Exceções customizadas
-- Rastreamento de erros
-- Decorators para tratamento automático
-
-### 8. Retry Manager
-
-Sistema de retry com exponential backoff:
-- Retry configurável
-- Estratégias de backoff
-- Estatísticas de retry
-- Decorators para retry automático
-
-### 9. Metrics Collector
-
-Coleta de métricas de execução:
-- Métricas por etapa
-- Contadores
-- Timers
-- Resumos de performance
-
-## Fluxo de Execução
+## Fluxo de Dados
 
 ```
-[Fonte de Dados]
-      ↓
-[DataExtractor] → Extrai dados
-      ↓
-[DataValidator] → Valida dados
-      ↓
-[DataTransformer] → Transforma dados
-      ↓
-[DataValidator] → Valida transformações
-      ↓
-[DataLoader] → Persiste dados
-      ↓
-[MetricsCollector] → Registra métricas
+┌─────────────┐
+│   Fonte     │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│  Conector   │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│  Extract    │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│ Processador │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│  Validacao  │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│    Load     │
+└──────┬──────┘
+       │
+       v
+┌─────────────┐
+│   Destino   │
+└─────────────┘
 ```
 
-## Tratamento de Erros
+## Padroes de Design
 
-Cada módulo possui tratamento de erros específico:
-- Erros são logados
-- Métricas de erro são coletadas
-- Sistema de retry é aplicado quando apropriado
-- Exceções customizadas fornecem contexto
+### Factory Pattern
+Usado em `ConnectorFactory` e `DatabaseFactory` para criacao de objetos.
+
+### Chain of Responsibility
+Usado em `ProcessorChain` para encadear processadores.
+
+### Strategy Pattern
+Usado em processadores para diferentes estrategias de transformacao.
+
+### Decorator Pattern
+Usado em `RecoverableStep` para adicionar checkpoint.
+
+### Observer Pattern
+Callbacks de progresso em batch processors.
 
 ## Extensibilidade
 
-O sistema é facilmente extensível:
-- Novos extractors podem ser adicionados
-- Transformações customizadas via funções
-- Novos loaders para diferentes destinos
-- Validadores customizados
+### Adicionar Novo Conector
+
+```python
+class CustomConnector(BaseConnector):
+    def read(self, source, **kwargs):
+        # Implementacao
+        pass
+
+    def write(self, df, destination, **kwargs):
+        # Implementacao
+        pass
+```
+
+### Adicionar Novo Processador
+
+```python
+class CustomProcessor(BaseProcessor):
+    def process(self, df):
+        # Implementacao
+        return df
+```
+
+### Adicionar Nova Validacao
+
+```python
+validator = DataQualityValidator()
+validator.add_custom_check(
+    name='custom_check',
+    check_func=lambda df: my_validation(df),
+    description='Minha validacao'
+)
+```
+
+## Boas Praticas
+
+1. **Idempotencia**: Pipelines devem ser rexecutaveis sem efeitos colaterais
+2. **Checkpoints**: Usar checkpoints em pipelines longos
+3. **Validacao**: Sempre validar dados antes de carregar
+4. **Logging**: Usar logger estruturado para rastreabilidade
+5. **Testes**: Manter cobertura > 80%
+
+## Metricas e Monitoramento
+
+- Tempo de execucao por etapa
+- Numero de registros processados
+- Taxa de sucesso/falha
+- Memoria utilizada
+- Data lineage completo
+
+## Escalabilidade
+
+- Processamento paralelo para grandes volumes
+- Batch adaptativo para otimizacao
+- Streaming para dados continuos
+- Particoes para distribuicao
+
+## Seguranca
+
+- Credenciais em variaveis de ambiente
+- Transacoes para atomicidade
+- Validacao de schema
+- Logs sanitizados
+
+---
+
+*Arquitetura projetada para escalabilidade, manutenibilidade e extensibilidade.*
