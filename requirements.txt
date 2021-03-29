@@ -5,3 +5,8 @@ openpyxl
 psycopg2-binary
 pymysql
 sqlalchemy
+pre-commit
+black
+flake8
+isort
+mypy
