@@ -7,6 +7,21 @@ import pandas as pd
 from typing import Dict, Any, Optional, List
 from contextlib import contextmanager
 
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
+
+try:
+    import pymysql
+except ImportError:
+    pymysql = None
+
+try:
+    from sqlalchemy import create_engine
+except ImportError:
+    create_engine = None
+
 
 class DatabaseConnector(ABC):
     """Classe base para conectores de banco de dados"""
@@ -59,8 +74,9 @@ class PostgresConnector(DatabaseConnector):
 
     def connect(self):
         """Conecta ao PostgreSQL"""
+        if psycopg2 is None:
+            raise ImportError("psycopg2 nao instalado. Execute: pip install psycopg2-binary")
         try:
-            import psycopg2
             self.connection = psycopg2.connect(
                 host=self.host,
                 port=self.port,
@@ -68,8 +84,6 @@ class PostgresConnector(DatabaseConnector):
                 user=self.user,
                 password=self.password
             )
-        except ImportError:
-            raise ImportError("psycopg2 nao instalado. Execute: pip install psycopg2-binary")
         except Exception as e:
             raise ConnectionError(f"Erro ao conectar PostgreSQL: {e}")
 
@@ -94,8 +108,10 @@ class PostgresConnector(DatabaseConnector):
         if not self.connection:
             self.connect()
 
+        if create_engine is None:
+            raise ImportError("sqlalchemy nao instalado. Execute: pip install sqlalchemy")
+
         try:
-            from sqlalchemy import create_engine
             engine = create_engine(self.connection_string)
             df.to_sql(table, engine, if_exists=if_exists, index=False)
             return True
@@ -117,8 +133,9 @@ class MySQLConnector(DatabaseConnector):
 
     def connect(self):
         """Conecta ao MySQL"""
+        if pymysql is None:
+            raise ImportError("pymysql nao instalado. Execute: pip install pymysql")
         try:
-            import pymysql
             self.connection = pymysql.connect(
                 host=self.host,
                 port=self.port,
@@ -126,8 +143,6 @@ class MySQLConnector(DatabaseConnector):
                 user=self.user,
                 password=self.password
             )
-        except ImportError:
-            raise ImportError("pymysql nao instalado. Execute: pip install pymysql")
         except Exception as e:
             raise ConnectionError(f"Erro ao conectar MySQL: {e}")
 
@@ -152,8 +167,10 @@ class MySQLConnector(DatabaseConnector):
         if not self.connection:
             self.connect()
 
+        if create_engine is None:
+            raise ImportError("sqlalchemy nao instalado. Execute: pip install sqlalchemy")
+
         try:
-            from sqlalchemy import create_engine
             engine = create_engine(self.connection_string)
             df.to_sql(table, engine, if_exists=if_exists, index=False)
             return True

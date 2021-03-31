@@ -1,85 +1,35 @@
-# Python ETL Pipeline
+# Pipeline ETL Avancado
 
-Pipeline ETL modular e robusto para extração, transformação e carga de dados.
+Sistema ETL modular e extensivel para processamento de dados em larga escala.
 
-## Recursos
+## Caracteristicas
 
-- Extração de múltiplas fontes (CSV, JSON, Excel)
-- Transformações customizáveis
-- Carga para diversos formatos
-- Logging estruturado
-- Sistema de retry
-- Validação de dados
-- Métricas de execução
-- Error handling robusto
+- Suporte a multiplas fontes de dados (CSV, JSON, Excel, Parquet, PostgreSQL, MySQL)
+- Processamento paralelo e batch otimizado
+- Validacao de qualidade e schema
+- Carga incremental e CDC
+- Data lineage tracking
+- Sistema de checkpoint e recuperacao
+- Exportacao para multiplos formatos
+- Testes completos (80%+ cobertura)
 
-## Estrutura
+## Instalacao
 
-```
-etl/
-├── extract.py       # Extração de dados
-├── transform.py     # Transformação de dados
-├── load.py          # Carga de dados
-├── pipeline.py      # Orquestrador de pipeline
-├── logger.py        # Sistema de logging
-├── validators.py    # Validadores de dados
-├── error_handler.py # Tratamento de erros
-├── retry.py         # Sistema de retry
-├── metrics.py       # Métricas de execução
-└── exceptions.py    # Exceções customizadas
-
-tests/
-├── test_extract.py     # Testes de extração
-├── test_transform.py   # Testes de transformação
-└── test_load.py        # Testes de carga
+```bash
+pip install -r requirements.txt
 ```
 
-## Uso Básico
+## Uso Basico
 
-### Extração de Dados
+### Pipeline Simples
 
 ```python
-from etl.extract import DataExtractor
+from etl.orchestrator import ETLOrchestrator
 
-extractor = DataExtractor()
-df = extractor.extract('data.csv', source_type='csv')
-```
-
-### Transformação de Dados
-
-```python
-from etl.transform import DataTransformer
-
-transformer = DataTransformer()
-df_clean = transformer.remove_duplicates(df)
-df_clean = transformer.remove_null_rows(df_clean)
-```
-
-### Carga de Dados
-
-```python
-from etl.load import DataLoader
-
-loader = DataLoader()
-loader.load(df_clean, 'output.csv', format_type='csv')
-```
-
-### Pipeline Completo
-
-```python
-from etl.pipeline import ETLPipeline
-
-pipeline = ETLPipeline(name="Meu Pipeline")
-
-transformations = [
-    lambda df: transformer.remove_duplicates(df),
-    lambda df: transformer.remove_null_rows(df)
-]
-
-result = pipeline.run(
-    source='input.csv',
-    destination='output.csv',
-    transformations=transformations,
+orchestrator = ETLOrchestrator("Meu Pipeline")
+result = orchestrator.execute(
+    source='data/input.csv',
+    destination='output/processed.csv',
     source_type='csv',
     dest_type='csv'
 )
@@ -88,78 +38,267 @@ print(f"Status: {result['status']}")
 print(f"Linhas processadas: {result['rows_processed']}")
 ```
 
-## Logging
-
-O sistema possui logging estruturado rotacionado:
+### Pipeline com Transformacoes
 
 ```python
-from etl.logger import get_logger
+from etl.orchestrator import ETLOrchestrator
 
-logger = get_logger('meu_etl')
-logger.info("Processamento iniciado")
-logger.log_pipeline_execution("Pipeline X", duration=10.5, rows=1000)
+def remover_duplicatas(df):
+    return df.drop_duplicates()
+
+def filtrar_ativos(df):
+    return df[df['ativo'] == True]
+
+orchestrator = ETLOrchestrator("Pipeline Transformado")
+result = orchestrator.execute(
+    source='data/usuarios.csv',
+    destination='output/usuarios_limpos.parquet',
+    source_type='csv',
+    dest_type='parquet',
+    transformations=[remover_duplicatas, filtrar_ativos]
+)
 ```
 
-Logs são salvos em `logs/etl.log` com rotação automática.
-
-## Validação de Dados
+### Validacao de Qualidade
 
 ```python
-from etl.validators import DataValidator
+from etl.quality import DataQualityValidator
+import pandas as pd
 
-validator = DataValidator()
+df = pd.read_csv('data/clientes.csv')
 
-rules = [
-    {'type': 'not_null', 'columns': ['id', 'name']},
-    {'type': 'unique', 'columns': ['id']},
-    {'type': 'data_type', 'column_types': {'id': 'int', 'name': 'string'}}
-]
+validator = DataQualityValidator()
+validator.add_completeness_check(['email', 'telefone'], threshold=0.95)
+validator.add_uniqueness_check(['cpf'])
+validator.add_pattern_check('email', r'^[\w\.-]+@[\w\.-]+\.\w+$')
 
-result = validator.validate_all(df, rules)
-print(f"Validação: {result['all_passed']}")
+report = validator.validate(df)
+print(f"Taxa de sucesso: {report['success_rate']:.1%}")
 ```
 
-## Retry
-
-Sistema de retry com exponential backoff:
+### Validacao de Schema
 
 ```python
-from etl.retry import RetryConfig, retry_operation
+from etl.schema import TableSchema, ColumnSchema, DataType
 
-config = RetryConfig(max_attempts=3, delay=1.0, backoff_factor=2.0)
+schema = TableSchema('usuarios')
+schema.add_column(ColumnSchema('id', DataType.INTEGER, nullable=False, unique=True))
+schema.add_column(ColumnSchema('nome', DataType.STRING, nullable=False))
+schema.add_column(ColumnSchema('idade', DataType.INTEGER, min_value=0, max_value=120))
 
-@retry_operation(config)
-def operacao_com_retry():
-    # operação que pode falhar
-    pass
+result = schema.validate(df)
+if not result['valid']:
+    print(f"Erros: {result['errors']}")
 ```
 
-## Métricas
-
-Coleta de métricas de execução:
+### Carga Incremental
 
 ```python
-from etl.metrics import PipelineMetrics
+from etl.incremental import IncrementalLoadManager
+import pandas as pd
 
-metrics = PipelineMetrics()
-metrics.record_extraction(rows=1000, duration=2.5, source='data.csv')
-summary = metrics.get_performance_summary()
+manager = IncrementalLoadManager('state/state.json')
+
+df = pd.read_csv('data/vendas.csv')
+incremental_df = manager.get_incremental_data(
+    df=df,
+    key_column='id',
+    comparison_column='data_venda',
+    state_key='vendas_pipeline'
+)
+
+print(f"Novos registros: {len(incremental_df)}")
 ```
+
+### Processamento Paralelo
+
+```python
+from etl.parallel import ParallelProcessor
+import pandas as pd
+
+def processar_chunk(chunk):
+    chunk['total'] = chunk['quantidade'] * chunk['preco']
+    return chunk
+
+processor = ParallelProcessor(n_workers=4)
+df = pd.read_csv('data/pedidos.csv')
+
+result_df = processor.process_chunks(df, processar_chunk)
+```
+
+### Banco de Dados
+
+```python
+from etl.database import DatabaseFactory
+
+config = {
+    'host': 'localhost',
+    'port': 5432,
+    'database': 'etl_db',
+    'user': 'etl_user',
+    'password': 'senha'
+}
+
+connector = DatabaseFactory.create('postgres', config)
+
+with connector.transaction():
+    df = connector.execute_query("SELECT * FROM vendas WHERE data > '2021-01-01'")
+    connector.insert_dataframe(df_processado, 'vendas_processadas')
+```
+
+### Checkpoint e Recuperacao
+
+```python
+from etl.checkpoint import CheckpointManager, PipelineRecovery
+
+checkpoint_mgr = CheckpointManager('checkpoints/')
+
+checkpoint_id = checkpoint_mgr.create_checkpoint(
+    pipeline_name='vendas_pipeline',
+    step='transformacao',
+    data=df_transformado,
+    metadata={'rows': len(df_transformado)}
+)
+
+recovery = PipelineRecovery(checkpoint_mgr)
+if recovery.can_recover('vendas_pipeline'):
+    checkpoint = recovery.recover('vendas_pipeline')
+    df = checkpoint['data']
+```
+
+### Data Lineage
+
+```python
+from etl.lineage import DataLineageTracker
+
+tracker = DataLineageTracker('lineage/lineage.json')
+
+tracker.track_pipeline_execution(
+    source='data/vendas.csv',
+    transformations=['limpeza', 'agregacao', 'enriquecimento'],
+    target='output/vendas_final.parquet',
+    metadata={'author': 'pipeline_vendas', 'version': '2.0'}
+)
+
+tracker.save()
+print(tracker.visualize_graph())
+```
+
+### Exportacao Multi-formato
+
+```python
+from etl.export import DataExporter
+import pandas as pd
+
+df = pd.read_csv('data/relatorio.csv')
+
+exporter = DataExporter()
+results = exporter.export_multiple_formats(
+    df=df,
+    base_path='output/relatorio',
+    formats=['csv', 'parquet', 'excel', 'json']
+)
+
+for fmt, success in results.items():
+    print(f"{fmt}: {'OK' if success else 'FALHOU'}")
+```
+
+## CLI
+
+```bash
+python main.py input.csv output.parquet \
+    --source-type csv \
+    --dest-type parquet \
+    --remove-duplicates \
+    --remove-nulls \
+    --validate \
+    --metrics
+```
+
+## Docker
+
+### Build
+
+```bash
+docker-compose build
+```
+
+### Executar
+
+```bash
+docker-compose up -d
+```
+
+### Acessar Adminer
+
+http://localhost:8080
 
 ## Testes
 
-Execute os testes:
+### Executar todos os testes
 
 ```bash
 pytest tests/ -v
 ```
 
+### Com cobertura
+
+```bash
+pytest tests/ -v --cov=etl --cov-report=html
+```
+
+### Testes especificos
+
+```bash
+pytest tests/test_integration.py -v
+```
+
+## Estrutura do Projeto
+
+```
+.
+├── etl/
+│   ├── __init__.py
+│   ├── connectors.py          # Conectores de dados
+│   ├── database.py            # Conectores DB
+│   ├── processors.py          # Processadores
+│   ├── orchestrator.py        # Orquestrador
+│   ├── pipeline.py            # Pipeline principal
+│   ├── incremental.py         # Carga incremental
+│   ├── quality.py             # Validacao qualidade
+│   ├── schema.py              # Validacao schema
+│   ├── parallel.py            # Processamento paralelo
+│   ├── lineage.py             # Data lineage
+│   ├── checkpoint.py          # Checkpoint/recovery
+│   ├── export.py              # Exportacao
+│   └── batch_optimizer.py     # Otimizacao batch
+├── tests/
+│   ├── test_integration.py
+│   ├── test_database.py
+│   ├── test_quality.py
+│   └── test_schema.py
+├── main.py
+├── requirements.txt
+├── docker-compose.yml
+├── Dockerfile
+├── ARCHITECTURE.md
+└── README.md
+```
+
 ## Tecnologias
 
 - Python 3.8+
-- pandas (manipulação de dados)
-- pytest (testes)
+- pandas
+- pytest
+- PostgreSQL
+- MySQL
+- Docker
+- pre-commit
 
-## Licença
+## Licenca
 
 MIT
+
+## Contato
+
+Para duvidas ou sugestoes, abra uma issue.

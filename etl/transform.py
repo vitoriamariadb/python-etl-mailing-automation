@@ -91,7 +91,8 @@ class DataTransformer:
         Returns:
             DataFrame filtrado
         """
-        result = df[condition(df)]
+        mask = condition(df).fillna(False)
+        result = df[mask].drop_duplicates()
         self.transformations_applied.append('filter_rows')
         return result
 

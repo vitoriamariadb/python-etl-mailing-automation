@@ -13,7 +13,7 @@ from etl.extract import DataExtractor
 from etl.transform import DataTransformer
 from etl.load import DataLoader
 from etl.logger import get_logger
-from etl.exceptions import ETLException
+from etl.exceptions import ETLBaseException
 
 
 logger = get_logger('pipeline')
@@ -102,7 +102,7 @@ class ETLPipeline:
                 - error: Mensagem de erro (se falhou)
 
         Raises:
-            ETLException: Se ocorrer erro durante execucao
+            ETLBaseException: Se ocorrer erro durante execucao
 
         Example:
             >>> pipeline = ETLPipeline("Example")

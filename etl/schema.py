@@ -204,8 +204,8 @@ class SchemaInferrer:
             pandas_dtype = str(df[col].dtype)
             data_type = dtype_map.get(pandas_dtype, DataType.STRING)
 
-            nullable = df[col].isna().any()
-            unique = df[col].nunique() == len(df)
+            nullable = bool(df[col].isna().any())
+            unique = bool(df[col].nunique() == len(df))
 
             column = ColumnSchema(
                 name=col,
