@@ -172,3 +172,4 @@ class ConnectorFactory:
 
 
 # "A riqueza consiste muito mais no desfrute do que na posse." -- Aristoteles
+
