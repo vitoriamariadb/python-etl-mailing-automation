@@ -330,3 +330,4 @@ class PartitionedExporter:
 
         logger.info(f"Exportadas {len(results)} particoes")
         return results
+
