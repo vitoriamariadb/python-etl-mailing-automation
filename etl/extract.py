@@ -87,3 +87,4 @@ class DataExtractor:
             return self.extract_from_excel(source, **kwargs)
 
         raise NotImplementedError(f"Extracao para {source_type} nao implementada")
+
