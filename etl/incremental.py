@@ -182,3 +182,4 @@ class CDCProcessor:
             'updates': len(changes['updates']),
             'deletes': len(changes['deletes'])
         }
+
