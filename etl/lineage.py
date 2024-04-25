@@ -244,3 +244,4 @@ class DataLineageTracker:
             lines.append(f"  {source_name} --[{edge.edge_type}]--> {target_name}")
 
         return "\n".join(lines)
+
