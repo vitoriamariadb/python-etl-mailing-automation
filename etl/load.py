@@ -122,3 +122,4 @@ class DataLoader:
             return self.load_to_parquet(df, destination, **kwargs)
 
         raise NotImplementedError(f"Carga para {format_type} nao implementada")
+
