@@ -102,3 +102,4 @@ def get_logger(name: str = 'etl', log_dir: Path | None = None, level: int = logg
         Instancia de ETLLogger
     """
     return ETLLogger(name, log_dir, level)
+
