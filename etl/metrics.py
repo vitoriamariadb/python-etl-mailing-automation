@@ -189,3 +189,4 @@ class PipelineMetrics:
     def reset(self):
         """Reseta metricas"""
         self.collector.reset()
+
