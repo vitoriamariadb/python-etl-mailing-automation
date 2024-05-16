@@ -209,3 +209,4 @@ class ETLPipeline:
 
 
 # "A vida nao examinada nao vale a pena ser vivida." -- Socrates
+
