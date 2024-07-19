@@ -217,3 +217,4 @@ class DataQualityValidator:
     def get_failed_rules(self) -> list[dict[str, Any]]:
         """Retorna apenas regras que falharam"""
         return [r for r in self.results if not r.get('passed', False)]
+
