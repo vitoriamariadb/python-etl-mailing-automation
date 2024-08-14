@@ -160,3 +160,4 @@ def exponential_backoff(attempt: int, base_delay: float = 1.0, max_delay: float 
     """
     delay = base_delay * (2 ** (attempt - 1))
     return min(delay, max_delay)
+
