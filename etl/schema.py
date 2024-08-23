@@ -213,3 +213,4 @@ class SchemaInferrer:
 
         logger.info(f"Schema inferido com {len(schema.columns)} colunas")
         return schema
+
