@@ -146,3 +146,4 @@ class DataTransformer:
     def reset_tracking(self):
         """Reset do tracking de transformacoes aplicadas"""
         self.transformations_applied = []
+
