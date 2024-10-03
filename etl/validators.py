@@ -223,3 +223,4 @@ class DataValidator:
     def reset(self) -> None:
         """Reseta resultados de validacao"""
         self.validation_results = []
+
