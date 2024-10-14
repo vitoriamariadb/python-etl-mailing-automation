@@ -186,3 +186,4 @@ class TestDatabaseConnectors:
 
         mock_psycopg2.connect.assert_called_once()
         mock_conn.close.assert_called_once()
+
