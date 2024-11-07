@@ -97,3 +97,4 @@ class TestDataExtractor:
 def cleanup():
     """Cleanup de arquivos temporarios"""
     yield
+
