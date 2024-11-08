@@ -171,3 +171,4 @@ class TestETLIntegration:
 
         assert result['status'] == 'failed'
         assert 'error' in result
+
