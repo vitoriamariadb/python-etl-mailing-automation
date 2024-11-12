@@ -94,3 +94,4 @@ class TestDataLoader:
         assert 'json' in loader.supported_formats
         assert 'excel' in loader.supported_formats
         assert 'parquet' in loader.supported_formats
+
