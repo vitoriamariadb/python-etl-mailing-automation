@@ -159,3 +159,4 @@ class TestDataProfiler:
         assert "status" in const_warnings[0]
 
 # "Aquele que tem um porque para viver pode suportar quase qualquer como." -- Friedrich Nietzsche
+
