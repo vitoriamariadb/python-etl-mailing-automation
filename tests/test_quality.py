@@ -164,3 +164,4 @@ class TestDataQuality:
         assert result['passed'] is True
         assert result['rule'] == 'test_rule'
         assert 'timestamp' in result
+
