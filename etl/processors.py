@@ -4,8 +4,7 @@ Processadores de dados modulares
 
 from abc import ABC, abstractmethod
 import pandas as pd
-from typing import Callable, List
-
+from typing import Callable
 
 class BaseProcessor(ABC):
     """Classe base para processadores de dados"""
@@ -14,7 +13,6 @@ class BaseProcessor(ABC):
     def process(self, df: pd.DataFrame) -> pd.DataFrame:
         """Processa dados"""
         pass
-
 
 class CleaningProcessor(BaseProcessor):
     """Processador de limpeza de dados"""
@@ -35,11 +33,10 @@ class CleaningProcessor(BaseProcessor):
 
         return result
 
-
 class TransformationProcessor(BaseProcessor):
     """Processador de transformacoes customizadas"""
 
-    def __init__(self, transformations: List[Callable] = None):
+    def __init__(self, transformations: list[Callable] = None):
         self.transformations = transformations or []
 
     def add_transformation(self, func: Callable):
@@ -55,12 +52,11 @@ class TransformationProcessor(BaseProcessor):
 
         return result
 
-
 class ProcessorChain:
     """Encadeia multiplos processadores"""
 
     def __init__(self):
-        self.processors: List[BaseProcessor] = []
+        self.processors: list[BaseProcessor] = []
 
     def add(self, processor: BaseProcessor):
         """Adiciona processador a cadeia"""

@@ -3,8 +3,7 @@ Modulo de transformacao de dados
 """
 
 import pandas as pd
-from typing import List, Callable, Optional, Dict, Any
-
+from typing import Callable, Any
 
 class DataTransformer:
     """Transformador de dados com operacoes comuns"""
@@ -12,7 +11,7 @@ class DataTransformer:
     def __init__(self):
         self.transformations_applied = []
 
-    def remove_duplicates(self, df: pd.DataFrame, subset: Optional[List[str]] = None, keep: str = 'first') -> pd.DataFrame:
+    def remove_duplicates(self, df: pd.DataFrame, subset: list[str | None] = None, keep: str = 'first') -> pd.DataFrame:
         """
         Remove linhas duplicadas
 
@@ -28,7 +27,7 @@ class DataTransformer:
         self.transformations_applied.append('remove_duplicates')
         return result
 
-    def remove_null_rows(self, df: pd.DataFrame, columns: Optional[List[str]] = None, how: str = 'any') -> pd.DataFrame:
+    def remove_null_rows(self, df: pd.DataFrame, columns: list[str | None] = None, how: str = 'any') -> pd.DataFrame:
         """
         Remove linhas com valores nulos
 
@@ -44,7 +43,7 @@ class DataTransformer:
         self.transformations_applied.append('remove_null_rows')
         return result
 
-    def fill_null_values(self, df: pd.DataFrame, fill_value: Any = 0, columns: Optional[List[str]] = None) -> pd.DataFrame:
+    def fill_null_values(self, df: pd.DataFrame, fill_value: Any = 0, columns: list[str | None] = None) -> pd.DataFrame:
         """
         Preenche valores nulos
 
@@ -65,7 +64,7 @@ class DataTransformer:
         self.transformations_applied.append('fill_null_values')
         return result
 
-    def rename_columns(self, df: pd.DataFrame, column_mapping: Dict[str, str]) -> pd.DataFrame:
+    def rename_columns(self, df: pd.DataFrame, column_mapping: dict[str, str]) -> pd.DataFrame:
         """
         Renomeia colunas
 
@@ -96,7 +95,7 @@ class DataTransformer:
         self.transformations_applied.append('filter_rows')
         return result
 
-    def select_columns(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
+    def select_columns(self, df: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
         """
         Seleciona colunas especificas
 
@@ -128,7 +127,7 @@ class DataTransformer:
         self.transformations_applied.append('add_calculated_column')
         return result
 
-    def apply_transformations(self, df: pd.DataFrame, transformations: List[Callable[[pd.DataFrame], pd.DataFrame]]) -> pd.DataFrame:
+    def apply_transformations(self, df: pd.DataFrame, transformations: list[Callable[[pd.DataFrame], pd.DataFrame]]) -> pd.DataFrame:
         """
         Aplica lista de transformacoes em sequencia
 

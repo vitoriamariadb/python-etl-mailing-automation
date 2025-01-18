@@ -3,9 +3,8 @@ Validadores de dados para pipeline ETL
 """
 
 import pandas as pd
-from typing import List, Dict, Any, Optional, Callable
+from typing import Any, Callable
 from datetime import datetime
-
 
 class DataValidator:
     """Validador de dados com regras customizaveis"""
@@ -13,7 +12,7 @@ class DataValidator:
     def __init__(self):
         self.validation_results = []
 
-    def validate_not_null(self, df: pd.DataFrame, columns: List[str]) -> Dict[str, Any]:
+    def validate_not_null(self, df: pd.DataFrame, columns: list[str]) -> dict[str, Any]:
         """
         Valida que colunas nao possuem valores nulos
 
@@ -44,7 +43,7 @@ class DataValidator:
         self.validation_results.append(result)
         return result
 
-    def validate_unique(self, df: pd.DataFrame, columns: List[str]) -> Dict[str, Any]:
+    def validate_unique(self, df: pd.DataFrame, columns: list[str]) -> dict[str, Any]:
         """
         Valida que colunas possuem valores unicos
 
@@ -75,7 +74,7 @@ class DataValidator:
         self.validation_results.append(result)
         return result
 
-    def validate_data_type(self, df: pd.DataFrame, column_types: Dict[str, str]) -> Dict[str, Any]:
+    def validate_data_type(self, df: pd.DataFrame, column_types: dict[str, str]) -> dict[str, Any]:
         """
         Valida tipos de dados das colunas
 
@@ -116,7 +115,7 @@ class DataValidator:
         self.validation_results.append(result)
         return result
 
-    def validate_range(self, df: pd.DataFrame, column: str, min_value: Optional[Any] = None, max_value: Optional[Any] = None) -> Dict[str, Any]:
+    def validate_range(self, df: pd.DataFrame, column: str, min_value: Any | None = None, max_value: Any | None = None) -> dict[str, Any]:
         """
         Valida range de valores em uma coluna
 
@@ -156,7 +155,7 @@ class DataValidator:
         self.validation_results.append(result)
         return result
 
-    def validate_custom(self, df: pd.DataFrame, rule_name: str, validation_func: Callable[[pd.DataFrame], bool], error_message: str) -> Dict[str, Any]:
+    def validate_custom(self, df: pd.DataFrame, rule_name: str, validation_func: Callable[[pd.DataFrame], bool], error_message: str) -> dict[str, Any]:
         """
         Valida usando funcao customizada
 
@@ -186,7 +185,7 @@ class DataValidator:
         self.validation_results.append(result)
         return result
 
-    def validate_all(self, df: pd.DataFrame, rules: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def validate_all(self, df: pd.DataFrame, rules: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Executa multiplas validacoes
 

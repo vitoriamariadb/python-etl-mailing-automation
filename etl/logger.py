@@ -6,13 +6,11 @@ import logging
 import sys
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
-from typing import Optional
-
 
 class ETLLogger:
     """Logger estruturado para operacoes ETL"""
 
-    def __init__(self, name: str = 'etl', log_dir: Optional[Path] = None, level: int = logging.INFO):
+    def __init__(self, name: str = 'etl', log_dir: Path | None = None, level: int = logging.INFO):
         self.name = name
         self.log_dir = log_dir or Path('logs')
         self.log_dir.mkdir(parents=True, exist_ok=True)
@@ -91,8 +89,7 @@ class ETLLogger:
         """Log especifico para execucao de pipeline"""
         self.info(f"Pipeline: {pipeline_name} | Duracao: {duration:.2f}s | Linhas: {rows} | Status: {status}")
 
-
-def get_logger(name: str = 'etl', log_dir: Optional[Path] = None, level: int = logging.INFO) -> ETLLogger:
+def get_logger(name: str = 'etl', log_dir: Path | None = None, level: int = logging.INFO) -> ETLLogger:
     """
     Factory function para criar logger
 

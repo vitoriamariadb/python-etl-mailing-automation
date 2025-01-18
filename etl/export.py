@@ -4,14 +4,12 @@ Exportacao de dados para multiplos formatos
 
 import pandas as pd
 from pathlib import Path
-from typing import Union, Dict, Any, Optional, List
+from typing import Any
 from datetime import datetime
 
 from etl.logger import get_logger
 
-
 logger = get_logger('export')
-
 
 class DataExporter:
     """Exportador de dados para multiplos formatos"""
@@ -22,9 +20,9 @@ class DataExporter:
     def export_csv(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         separator: str = ',',
-        compression: Optional[str] = None,
+        compression: str | None = None,
         **kwargs
     ) -> bool:
         """
@@ -55,9 +53,9 @@ class DataExporter:
     def export_parquet(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         compression: str = 'snappy',
-        partition_cols: Optional[List[str]] = None,
+        partition_cols: list[str | None] = None,
         **kwargs
     ) -> bool:
         """
@@ -94,9 +92,9 @@ class DataExporter:
     def export_json(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         orient: str = 'records',
-        indent: Optional[int] = 2,
+        indent: int | None = 2,
         **kwargs
     ) -> bool:
         """
@@ -127,7 +125,7 @@ class DataExporter:
     def export_excel(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         sheet_name: str = 'Sheet1',
         **kwargs
     ) -> bool:
@@ -158,7 +156,7 @@ class DataExporter:
     def export_html(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         **kwargs
     ) -> bool:
         """
@@ -187,7 +185,7 @@ class DataExporter:
     def export_markdown(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         **kwargs
     ) -> bool:
         """
@@ -219,7 +217,7 @@ class DataExporter:
     def export(
         self,
         df: pd.DataFrame,
-        file_path: Union[str, Path],
+        file_path: str | Path,
         format_type: str,
         **kwargs
     ) -> bool:
@@ -253,10 +251,10 @@ class DataExporter:
     def export_multiple_formats(
         self,
         df: pd.DataFrame,
-        base_path: Union[str, Path],
-        formats: List[str],
+        base_path: str | Path,
+        formats: list[str],
         **kwargs
-    ) -> Dict[str, bool]:
+    ) -> dict[str, bool]:
         """
         Exporta para multiplos formatos
 
@@ -289,11 +287,10 @@ class DataExporter:
 
         return results
 
-
 class PartitionedExporter:
     """Exporta dados particionados"""
 
-    def __init__(self, base_path: Union[str, Path]):
+    def __init__(self, base_path: str | Path):
         self.base_path = Path(base_path)
 
     def export_by_column(
@@ -302,7 +299,7 @@ class PartitionedExporter:
         partition_column: str,
         format_type: str = 'parquet',
         **kwargs
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Exporta dados particionados por coluna
 

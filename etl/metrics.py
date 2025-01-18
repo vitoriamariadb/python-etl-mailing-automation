@@ -2,10 +2,9 @@
 Sistema de metricas para pipeline ETL
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Any
 from datetime import datetime
 from collections import defaultdict
-
 
 class MetricsCollector:
     """Coletor de metricas de execucao"""
@@ -15,7 +14,7 @@ class MetricsCollector:
         self.counters = defaultdict(int)
         self.timers = {}
 
-    def record_metric(self, name: str, value: Any, timestamp: Optional[datetime] = None):
+    def record_metric(self, name: str, value: Any, timestamp: datetime | None = None):
         """
         Registra uma metrica
 
@@ -69,7 +68,7 @@ class MetricsCollector:
 
         return duration
 
-    def get_metric_summary(self, name: str) -> Dict[str, Any]:
+    def get_metric_summary(self, name: str) -> dict[str, Any]:
         """
         Retorna resumo de uma metrica
 
@@ -104,7 +103,7 @@ class MetricsCollector:
             'last': values[-1]
         }
 
-    def get_all_metrics(self) -> Dict[str, Any]:
+    def get_all_metrics(self) -> dict[str, Any]:
         """
         Retorna todas as metricas
 
@@ -122,7 +121,6 @@ class MetricsCollector:
         self.metrics.clear()
         self.counters.clear()
         self.timers.clear()
-
 
 class PipelineMetrics:
     """Metricas especificas de pipeline ETL"""
@@ -159,7 +157,7 @@ class PipelineMetrics:
         self.collector.record_metric('pipeline_rows', rows)
         self.collector.increment_counter(f'pipeline_{status}')
 
-    def get_performance_summary(self) -> Dict[str, Any]:
+    def get_performance_summary(self) -> dict[str, Any]:
         """
         Retorna resumo de performance
 

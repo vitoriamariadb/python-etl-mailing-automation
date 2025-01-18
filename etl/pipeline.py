@@ -6,7 +6,7 @@ a execucao de pipelines ETL (Extract, Transform, Load).
 """
 
 import time
-from typing import Optional, List, Callable, Dict, Any
+from typing import Callable, Any
 import pandas as pd
 
 from etl.extract import DataExtractor
@@ -15,9 +15,7 @@ from etl.load import DataLoader
 from etl.logger import get_logger
 from etl.exceptions import ETLBaseException
 
-
 logger = get_logger('pipeline')
-
 
 class ETLPipeline:
     """
@@ -63,18 +61,18 @@ class ETLPipeline:
         self.extractor = DataExtractor()
         self.transformer = DataTransformer()
         self.loader = DataLoader()
-        self.execution_history: List[Dict[str, Any]] = []
+        self.execution_history: list[dict[str, Any]] = []
         logger.info(f"Pipeline criado: {name}")
 
     def run(
         self,
         source: str,
         destination: str,
-        transformations: Optional[List[Callable]] = None,
+        transformations: list[Callable | None] = None,
         source_type: str = 'csv',
         dest_type: str = 'csv',
         **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Executa pipeline ETL completo
 
@@ -162,7 +160,7 @@ class ETLPipeline:
             self.execution_history.append(result)
             return result
 
-    def get_execution_stats(self) -> Dict[str, Any]:
+    def get_execution_stats(self) -> dict[str, Any]:
         """
         Retorna estatisticas de execucao do pipeline
 

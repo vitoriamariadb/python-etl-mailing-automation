@@ -4,15 +4,13 @@ Otimizacoes para processamento em batch
 
 import pandas as pd
 import numpy as np
-from typing import Callable, List, Any, Optional, Dict
+from typing import Callable, Any
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 
 from etl.logger import get_logger
 
-
 logger = get_logger('batch_optimizer')
-
 
 class AdaptiveBatchProcessor:
     """Processador de batch com tamanho adaptativo"""
@@ -37,7 +35,7 @@ class AdaptiveBatchProcessor:
         self.min_batch_size = min_batch_size
         self.max_batch_size = max_batch_size
         self.target_time = target_time
-        self.batch_times: List[float] = []
+        self.batch_times: list[float] = []
 
     def _adjust_batch_size(self, execution_time: float):
         """Ajusta tamanho de batch baseado no tempo de execucao"""
@@ -57,8 +55,8 @@ class AdaptiveBatchProcessor:
         self,
         df: pd.DataFrame,
         func: Callable[[pd.DataFrame], Any],
-        progress_callback: Optional[Callable[[int, int], None]] = None
-    ) -> List[Any]:
+        progress_callback: Callable[[int, int | None, None]] = None
+    ) -> list[Any]:
         """
         Processa DataFrame com batch size adaptativo
 
@@ -99,7 +97,6 @@ class AdaptiveBatchProcessor:
         logger.info(f"Processados {batch_count} batches - tempo medio: {avg_time:.2f}s")
 
         return results
-
 
 class MemoryEfficientBatchProcessor:
     """Processador otimizado para uso de memoria"""
@@ -159,7 +156,6 @@ class MemoryEfficientBatchProcessor:
 
         return pd.concat(results, ignore_index=True)
 
-
 class ParallelBatchProcessor:
     """Processador de batches com paralelizacao otimizada"""
 
@@ -178,7 +174,7 @@ class ParallelBatchProcessor:
         self,
         df: pd.DataFrame,
         func: Callable[[pd.DataFrame], Any]
-    ) -> List[Any]:
+    ) -> list[Any]:
         """
         Processa batches em paralelo
 
@@ -212,7 +208,6 @@ class ParallelBatchProcessor:
         results.sort(key=lambda x: x[0])
         return [r[1] for r in results]
 
-
 class StreamingBatchProcessor:
     """Processador de batches em modo streaming"""
 
@@ -223,8 +218,8 @@ class StreamingBatchProcessor:
         self,
         file_path: str,
         func: Callable[[pd.DataFrame], Any],
-        chunksize: Optional[int] = None
-    ) -> List[Any]:
+        chunksize: int | None = None
+    ) -> list[Any]:
         """
         Processa arquivo em modo streaming
 

@@ -4,7 +4,7 @@ Conectores para bancos de dados
 
 from abc import ABC, abstractmethod
 import pandas as pd
-from typing import Dict, Any, Optional, List
+from typing import Any
 from contextlib import contextmanager
 
 try:
@@ -21,7 +21,6 @@ try:
     from sqlalchemy import create_engine
 except ImportError:
     create_engine = None
-
 
 class DatabaseConnector(ABC):
     """Classe base para conectores de banco de dados"""
@@ -41,7 +40,7 @@ class DatabaseConnector(ABC):
         pass
 
     @abstractmethod
-    def execute_query(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
+    def execute_query(self, query: str, params: dict | None = None) -> pd.DataFrame:
         """Executa query e retorna DataFrame"""
         pass
 
@@ -58,7 +57,6 @@ class DatabaseConnector(ABC):
             yield self
         finally:
             self.disconnect()
-
 
 class PostgresConnector(DatabaseConnector):
     """Conector para PostgreSQL"""
@@ -93,7 +91,7 @@ class PostgresConnector(DatabaseConnector):
             self.connection.close()
             self.connection = None
 
-    def execute_query(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
+    def execute_query(self, query: str, params: dict | None = None) -> pd.DataFrame:
         """Executa query SQL"""
         if not self.connection:
             self.connect()
@@ -117,7 +115,6 @@ class PostgresConnector(DatabaseConnector):
             return True
         except Exception as e:
             raise RuntimeError(f"Erro ao inserir dados: {e}")
-
 
 class MySQLConnector(DatabaseConnector):
     """Conector para MySQL"""
@@ -152,7 +149,7 @@ class MySQLConnector(DatabaseConnector):
             self.connection.close()
             self.connection = None
 
-    def execute_query(self, query: str, params: Optional[Dict] = None) -> pd.DataFrame:
+    def execute_query(self, query: str, params: dict | None = None) -> pd.DataFrame:
         """Executa query SQL"""
         if not self.connection:
             self.connect()
@@ -177,12 +174,11 @@ class MySQLConnector(DatabaseConnector):
         except Exception as e:
             raise RuntimeError(f"Erro ao inserir dados: {e}")
 
-
 class DatabaseFactory:
     """Factory para criacao de conectores de banco"""
 
     @staticmethod
-    def create(db_type: str, config: Dict[str, Any]) -> DatabaseConnector:
+    def create(db_type: str, config: dict[str, Any]) -> DatabaseConnector:
         """
         Cria conector de banco de dados
 

@@ -3,14 +3,12 @@ Validacao e gestao de schemas de dados
 """
 
 import pandas as pd
-from typing import Dict, List, Any, Optional, Union
+from typing import Any
 from enum import Enum
 
 from etl.logger import get_logger
 
-
 logger = get_logger('schema')
-
 
 class DataType(Enum):
     """Tipos de dados suportados"""
@@ -21,7 +19,6 @@ class DataType(Enum):
     DATETIME = 'datetime'
     DATE = 'date'
 
-
 class ColumnSchema:
     """Definicao de schema de uma coluna"""
 
@@ -31,8 +28,8 @@ class ColumnSchema:
         dtype: DataType,
         nullable: bool = True,
         unique: bool = False,
-        min_value: Optional[Any] = None,
-        max_value: Optional[Any] = None
+        min_value: Any | None = None,
+        max_value: Any | None = None
     ):
         self.name = name
         self.dtype = dtype
@@ -41,7 +38,7 @@ class ColumnSchema:
         self.min_value = min_value
         self.max_value = max_value
 
-    def validate(self, series: pd.Series) -> Dict[str, Any]:
+    def validate(self, series: pd.Series) -> dict[str, Any]:
         """
         Valida serie contra schema
 
@@ -101,20 +98,19 @@ class ColumnSchema:
             'errors': errors
         }
 
-
 class TableSchema:
     """Definicao de schema de uma tabela"""
 
     def __init__(self, name: str):
         self.name = name
-        self.columns: Dict[str, ColumnSchema] = {}
+        self.columns: dict[str, ColumnSchema] = {}
 
     def add_column(self, column: ColumnSchema):
         """Adiciona coluna ao schema"""
         self.columns[column.name] = column
         return self
 
-    def validate(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def validate(self, df: pd.DataFrame) -> dict[str, Any]:
         """
         Valida DataFrame contra schema
 
@@ -156,7 +152,7 @@ class TableSchema:
             'extra_columns': list(extra_columns) if extra_columns else []
         }
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Converte schema para dicionario"""
         return {
             'name': self.name,
@@ -171,7 +167,6 @@ class TableSchema:
                 for name, col in self.columns.items()
             }
         }
-
 
 class SchemaInferrer:
     """Infere schema a partir de DataFrame"""

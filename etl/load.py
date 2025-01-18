@@ -4,8 +4,7 @@ Modulo de carga de dados para multiplos destinos
 
 import pandas as pd
 from pathlib import Path
-from typing import Union, Optional, Dict, Any
-
+from typing import Any
 
 class DataLoader:
     """Carregador de dados para multiplos destinos"""
@@ -13,7 +12,7 @@ class DataLoader:
     def __init__(self):
         self.supported_formats = ['csv', 'json', 'excel', 'parquet']
 
-    def load_to_csv(self, df: pd.DataFrame, file_path: Union[str, Path], index: bool = False, **kwargs) -> bool:
+    def load_to_csv(self, df: pd.DataFrame, file_path: str | Path, index: bool = False, **kwargs) -> bool:
         """
         Carrega dados para arquivo CSV
 
@@ -34,7 +33,7 @@ class DataLoader:
         except Exception as e:
             raise RuntimeError(f"Erro ao salvar CSV: {e}")
 
-    def load_to_json(self, df: pd.DataFrame, file_path: Union[str, Path], orient: str = 'records', **kwargs) -> bool:
+    def load_to_json(self, df: pd.DataFrame, file_path: str | Path, orient: str = 'records', **kwargs) -> bool:
         """
         Carrega dados para arquivo JSON
 
@@ -55,7 +54,7 @@ class DataLoader:
         except Exception as e:
             raise RuntimeError(f"Erro ao salvar JSON: {e}")
 
-    def load_to_excel(self, df: pd.DataFrame, file_path: Union[str, Path], sheet_name: str = 'Sheet1', index: bool = False, **kwargs) -> bool:
+    def load_to_excel(self, df: pd.DataFrame, file_path: str | Path, sheet_name: str = 'Sheet1', index: bool = False, **kwargs) -> bool:
         """
         Carrega dados para arquivo Excel
 
@@ -77,7 +76,7 @@ class DataLoader:
         except Exception as e:
             raise RuntimeError(f"Erro ao salvar Excel: {e}")
 
-    def load_to_parquet(self, df: pd.DataFrame, file_path: Union[str, Path], **kwargs) -> bool:
+    def load_to_parquet(self, df: pd.DataFrame, file_path: str | Path, **kwargs) -> bool:
         """
         Carrega dados para arquivo Parquet
 
@@ -97,7 +96,7 @@ class DataLoader:
         except Exception as e:
             raise RuntimeError(f"Erro ao salvar Parquet: {e}")
 
-    def load(self, df: pd.DataFrame, destination: Union[str, Path], format_type: str = 'csv', **kwargs) -> bool:
+    def load(self, df: pd.DataFrame, destination: str | Path, format_type: str = 'csv', **kwargs) -> bool:
         """
         Metodo generico de carga
 

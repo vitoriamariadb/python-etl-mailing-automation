@@ -5,21 +5,19 @@ Gerenciamento de carga incremental
 import json
 import pandas as pd
 from pathlib import Path
-from typing import Optional, Dict, Any, Union
+from typing import Any
 from datetime import datetime
 
 from etl.logger import get_logger
 
-
 logger = get_logger('incremental')
-
 
 class IncrementalLoadManager:
     """Gerencia estado de cargas incrementais"""
 
-    def __init__(self, state_file: Union[str, Path] = 'state/incremental_state.json'):
+    def __init__(self, state_file: str | Path = 'state/incremental_state.json'):
         self.state_file = Path(state_file)
-        self.state: Dict[str, Any] = {}
+        self.state: dict[str, Any] = {}
         self._load_state()
 
     def _load_state(self):
@@ -47,7 +45,7 @@ class IncrementalLoadManager:
             logger.error(f"Erro ao salvar estado: {e}")
             raise
 
-    def get_last_value(self, key: str) -> Optional[Any]:
+    def get_last_value(self, key: str) -> Any | None:
         """
         Recupera ultimo valor para uma chave
 
@@ -109,12 +107,11 @@ class IncrementalLoadManager:
 
         return incremental_df
 
-
 class CDCProcessor:
     """Processador de Change Data Capture"""
 
     def __init__(self):
-        self.changes: Dict[str, list] = {
+        self.changes: dict[str, list] = {
             'inserts': [],
             'updates': [],
             'deletes': []
@@ -125,7 +122,7 @@ class CDCProcessor:
         current_df: pd.DataFrame,
         previous_df: pd.DataFrame,
         key_column: str
-    ) -> Dict[str, pd.DataFrame]:
+    ) -> dict[str, pd.DataFrame]:
         """
         Detecta mudancas entre datasets
 
@@ -178,7 +175,7 @@ class CDCProcessor:
             'deletes': deletes
         }
 
-    def get_summary(self, changes: Dict[str, pd.DataFrame]) -> Dict[str, int]:
+    def get_summary(self, changes: dict[str, pd.DataFrame]) -> dict[str, int]:
         """Retorna sumario de mudancas"""
         return {
             'inserts': len(changes['inserts']),

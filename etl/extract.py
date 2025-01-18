@@ -4,8 +4,7 @@ Modulo de extracao de dados de multiplas fontes
 
 import pandas as pd
 from pathlib import Path
-from typing import Union, Dict, Any
-
+from typing import Any
 
 class DataExtractor:
     """Extrator de dados de multiplas fontes"""
@@ -13,7 +12,7 @@ class DataExtractor:
     def __init__(self):
         self.supported_formats = ['csv', 'json', 'excel']
 
-    def extract_from_csv(self, file_path: Union[str, Path], **kwargs) -> pd.DataFrame:
+    def extract_from_csv(self, file_path: str | Path, **kwargs) -> pd.DataFrame:
         """
         Extrai dados de arquivo CSV
 
@@ -30,7 +29,7 @@ class DataExtractor:
 
         return pd.read_csv(path, **kwargs)
 
-    def extract_from_json(self, file_path: Union[str, Path], **kwargs) -> pd.DataFrame:
+    def extract_from_json(self, file_path: str | Path, **kwargs) -> pd.DataFrame:
         """
         Extrai dados de arquivo JSON
 
@@ -47,7 +46,7 @@ class DataExtractor:
 
         return pd.read_json(path, **kwargs)
 
-    def extract_from_excel(self, file_path: Union[str, Path], sheet_name: str = 0, **kwargs) -> pd.DataFrame:
+    def extract_from_excel(self, file_path: str | Path, sheet_name: str = 0, **kwargs) -> pd.DataFrame:
         """
         Extrai dados de arquivo Excel
 
@@ -65,7 +64,7 @@ class DataExtractor:
 
         return pd.read_excel(path, sheet_name=sheet_name, **kwargs)
 
-    def extract(self, source: Union[str, Path, Dict[str, Any]], source_type: str = 'csv', **kwargs) -> pd.DataFrame:
+    def extract(self, source: str | Path | dict[str, Any], source_type: str = 'csv', **kwargs) -> pd.DataFrame:
         """
         Metodo generico de extracao
 

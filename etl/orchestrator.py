@@ -3,16 +3,14 @@ Orquestrador de pipeline ETL
 """
 
 import time
-from typing import Dict, Any, Optional, List, Callable
+from typing import Any, Callable
 import pandas as pd
 
 from etl.connectors import ConnectorFactory
 from etl.processors import ProcessorChain, CleaningProcessor, TransformationProcessor
 from etl.logger import get_logger
 
-
 logger = get_logger('orchestrator')
-
 
 class ETLOrchestrator:
     """Orquestra execucao de pipeline ETL completo"""
@@ -32,10 +30,10 @@ class ETLOrchestrator:
         destination: str,
         source_type: str = 'csv',
         dest_type: str = 'csv',
-        transformations: Optional[List[Callable]] = None,
+        transformations: list[Callable | None] = None,
         remove_duplicates: bool = False,
         remove_nulls: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Executa pipeline ETL completo
 

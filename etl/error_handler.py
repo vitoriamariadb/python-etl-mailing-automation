@@ -3,15 +3,13 @@ Sistema de error handling para pipeline ETL
 """
 
 import traceback
-from typing import Callable, Any, Optional, Dict
+from typing import Callable, Any
 from functools import wraps
 
 from .exceptions import ETLBaseException, ExtractionError, TransformationError, LoadError
 from .logger import get_logger
 
-
 logger = get_logger('error_handler')
-
 
 class ErrorHandler:
     """Handler centralizado de erros para pipeline ETL"""
@@ -20,7 +18,7 @@ class ErrorHandler:
         self.raise_on_error = raise_on_error
         self.errors = []
 
-    def handle_error(self, error: Exception, context: str = '', reraise: bool = None) -> Optional[Exception]:
+    def handle_error(self, error: Exception, context: str = '', reraise: bool = None) -> Exception | None:
         """
         Trata erro e registra
 
@@ -50,7 +48,7 @@ class ErrorHandler:
 
         return error
 
-    def get_error_summary(self) -> Dict[str, Any]:
+    def get_error_summary(self) -> dict[str, Any]:
         """
         Retorna resumo de erros
 
@@ -63,7 +61,7 @@ class ErrorHandler:
             'recent_errors': self.errors[-5:] if self.errors else []
         }
 
-    def _group_errors_by_type(self) -> Dict[str, int]:
+    def _group_errors_by_type(self) -> dict[str, int]:
         """Agrupa erros por tipo"""
         error_types = {}
         for error in self.errors:
@@ -74,7 +72,6 @@ class ErrorHandler:
     def clear_errors(self):
         """Limpa historico de erros"""
         self.errors = []
-
 
 def handle_etl_errors(context: str = '', error_type: type = ETLBaseException):
     """
@@ -96,7 +93,6 @@ def handle_etl_errors(context: str = '', error_type: type = ETLBaseException):
                 raise error_type(f"Erro em {context or func.__name__}: {str(e)}", {'original_error': str(e)})
         return wrapper
     return decorator
-
 
 def safe_execute(func: Callable, *args, default_value: Any = None, logger_instance: Any = None, **kwargs) -> Any:
     """

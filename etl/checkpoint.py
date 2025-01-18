@@ -5,20 +5,18 @@ Sistema de checkpoint e recuperacao de pipeline
 import json
 import pickle
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Any
 from datetime import datetime
 import hashlib
 
 from etl.logger import get_logger
 
-
 logger = get_logger('checkpoint')
-
 
 class CheckpointManager:
     """Gerencia checkpoints de execucao de pipeline"""
 
-    def __init__(self, checkpoint_dir: Union[str, Path] = 'checkpoints'):
+    def __init__(self, checkpoint_dir: str | Path = 'checkpoints'):
         """
         Inicializa gerenciador de checkpoints
 
@@ -27,7 +25,7 @@ class CheckpointManager:
         """
         self.checkpoint_dir = Path(checkpoint_dir)
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
-        self.current_checkpoint: Optional[str] = None
+        self.current_checkpoint: str | None = None
 
     def _generate_checkpoint_id(self, pipeline_name: str) -> str:
         """Gera ID unico para checkpoint"""
@@ -40,7 +38,7 @@ class CheckpointManager:
         pipeline_name: str,
         step: str,
         data: Any,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any | None] = None
     ) -> str:
         """
         Cria checkpoint de execucao
@@ -77,7 +75,7 @@ class CheckpointManager:
 
         return checkpoint_id
 
-    def load_checkpoint(self, checkpoint_id: str) -> Dict[str, Any]:
+    def load_checkpoint(self, checkpoint_id: str) -> dict[str, Any]:
         """
         Carrega checkpoint
 
@@ -106,7 +104,7 @@ class CheckpointManager:
             'data': data
         }
 
-    def list_checkpoints(self, pipeline_name: Optional[str] = None) -> list:
+    def list_checkpoints(self, pipeline_name: str | None = None) -> list:
         """
         Lista checkpoints disponiveis
 
@@ -128,7 +126,7 @@ class CheckpointManager:
         checkpoints.sort(key=lambda x: x['timestamp'], reverse=True)
         return checkpoints
 
-    def get_latest_checkpoint(self, pipeline_name: str) -> Optional[Dict[str, Any]]:
+    def get_latest_checkpoint(self, pipeline_name: str) -> dict[str, Any | None]:
         """
         Recupera checkpoint mais recente de um pipeline
 
@@ -183,7 +181,6 @@ class CheckpointManager:
 
         logger.info(f"Removidos {len(to_delete)} checkpoints antigos")
 
-
 class RecoverableStep:
     """Decorador para tornar passo de pipeline recuperavel"""
 
@@ -212,7 +209,6 @@ class RecoverableStep:
 
         return wrapper
 
-
 class PipelineRecovery:
     """Gerencia recuperacao de pipeline a partir de checkpoint"""
 
@@ -232,7 +228,7 @@ class PipelineRecovery:
         latest = self.checkpoint_manager.get_latest_checkpoint(pipeline_name)
         return latest is not None
 
-    def recover(self, pipeline_name: str) -> Dict[str, Any]:
+    def recover(self, pipeline_name: str) -> dict[str, Any]:
         """
         Recupera estado de pipeline
 

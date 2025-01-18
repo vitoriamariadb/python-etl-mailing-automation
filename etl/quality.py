@@ -3,14 +3,12 @@ Validacao de qualidade de dados
 """
 
 import pandas as pd
-from typing import Dict, List, Any, Optional, Callable
+from typing import Any, Callable
 from datetime import datetime
 
 from etl.logger import get_logger
 
-
 logger = get_logger('quality')
-
 
 class DataQualityRule:
     """Representa uma regra de qualidade de dados"""
@@ -20,7 +18,7 @@ class DataQualityRule:
         self.check_func = check_func
         self.description = description
 
-    def validate(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def validate(self, df: pd.DataFrame) -> dict[str, Any]:
         """
         Executa validacao
 
@@ -44,20 +42,19 @@ class DataQualityRule:
                 'timestamp': datetime.now().isoformat()
             }
 
-
 class DataQualityValidator:
     """Validador de qualidade de dados"""
 
     def __init__(self):
-        self.rules: List[DataQualityRule] = []
-        self.results: List[Dict[str, Any]] = []
+        self.rules: list[DataQualityRule] = []
+        self.results: list[dict[str, Any]] = []
 
     def add_rule(self, rule: DataQualityRule):
         """Adiciona regra de validacao"""
         self.rules.append(rule)
         return self
 
-    def add_completeness_check(self, columns: List[str], threshold: float = 0.95):
+    def add_completeness_check(self, columns: list[str], threshold: float = 0.95):
         """
         Adiciona check de completude
 
@@ -84,7 +81,7 @@ class DataQualityValidator:
         self.add_rule(rule)
         return self
 
-    def add_uniqueness_check(self, columns: List[str]):
+    def add_uniqueness_check(self, columns: list[str]):
         """
         Adiciona check de unicidade
 
@@ -184,7 +181,7 @@ class DataQualityValidator:
         self.add_rule(rule)
         return self
 
-    def validate(self, df: pd.DataFrame) -> Dict[str, Any]:
+    def validate(self, df: pd.DataFrame) -> dict[str, Any]:
         """
         Executa todas as validacoes
 
@@ -217,6 +214,6 @@ class DataQualityValidator:
 
         return report
 
-    def get_failed_rules(self) -> List[Dict[str, Any]]:
+    def get_failed_rules(self) -> list[dict[str, Any]]:
         """Retorna apenas regras que falharam"""
         return [r for r in self.results if not r.get('passed', False)]

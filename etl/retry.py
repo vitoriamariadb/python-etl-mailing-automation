@@ -3,14 +3,12 @@ Sistema de retry para operacoes ETL
 """
 
 import time
-from typing import Callable, Any, Optional, Tuple, Type
+from typing import Callable, Any, Type
 from functools import wraps
 
 from .logger import get_logger
 
-
 logger = get_logger('retry')
-
 
 class RetryConfig:
     """Configuracao de retry"""
@@ -20,15 +18,14 @@ class RetryConfig:
                  delay: float = 1.0,
                  backoff_factor: float = 2.0,
                  max_delay: float = 60.0,
-                 exceptions: Tuple[Type[Exception], ...] = (Exception,)):
+                 exceptions: tuple[Type[Exception], ...] = (Exception,)):
         self.max_attempts = max_attempts
         self.delay = delay
         self.backoff_factor = backoff_factor
         self.max_delay = max_delay
         self.exceptions = exceptions
 
-
-def retry_operation(config: Optional[RetryConfig] = None):
+def retry_operation(config: RetryConfig | None = None):
     """
     Decorator para retry automatico de operacoes
 
@@ -68,11 +65,10 @@ def retry_operation(config: Optional[RetryConfig] = None):
         return wrapper
     return decorator
 
-
 class RetryManager:
     """Gerenciador de retry para operacoes"""
 
-    def __init__(self, config: Optional[RetryConfig] = None):
+    def __init__(self, config: RetryConfig | None = None):
         self.config = config or RetryConfig()
         self.retry_stats = {
             'total_operations': 0,
@@ -149,7 +145,6 @@ class RetryManager:
             'successful_with_retry': 0,
             'failed': 0
         }
-
 
 def exponential_backoff(attempt: int, base_delay: float = 1.0, max_delay: float = 60.0) -> float:
     """

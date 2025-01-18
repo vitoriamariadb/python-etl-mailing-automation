@@ -3,21 +3,19 @@ Processamento paralelo de dados
 """
 
 import pandas as pd
-from typing import Callable, List, Any, Optional
+from typing import Callable, Any
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
 import numpy as np
 
 from etl.logger import get_logger
 
-
 logger = get_logger('parallel')
-
 
 class ParallelProcessor:
     """Processador paralelo de DataFrames"""
 
-    def __init__(self, n_workers: Optional[int] = None, use_processes: bool = True):
+    def __init__(self, n_workers: int | None = None, use_processes: bool = True):
         """
         Inicializa processador paralelo
 
@@ -29,7 +27,7 @@ class ParallelProcessor:
         self.use_processes = use_processes
         logger.info(f"Processador paralelo inicializado com {self.n_workers} workers")
 
-    def split_dataframe(self, df: pd.DataFrame, n_chunks: Optional[int] = None) -> List[pd.DataFrame]:
+    def split_dataframe(self, df: pd.DataFrame, n_chunks: int | None = None) -> list[pd.DataFrame]:
         """
         Divide DataFrame em chunks para processamento paralelo
 
@@ -55,7 +53,7 @@ class ParallelProcessor:
         self,
         df: pd.DataFrame,
         func: Callable[[pd.DataFrame], pd.DataFrame],
-        n_chunks: Optional[int] = None
+        n_chunks: int | None = None
     ) -> pd.DataFrame:
         """
         Processa DataFrame em paralelo aplicando funcao
@@ -118,7 +116,6 @@ class ParallelProcessor:
         else:
             return df.apply(func, axis=axis)
 
-
 class BatchProcessor:
     """Processa dados em batches"""
 
@@ -135,8 +132,8 @@ class BatchProcessor:
         self,
         df: pd.DataFrame,
         func: Callable[[pd.DataFrame], Any],
-        progress_callback: Optional[Callable[[int, int], None]] = None
-    ) -> List[Any]:
+        progress_callback: Callable[[int, int | None, None]] = None
+    ) -> list[Any]:
         """
         Processa DataFrame em batches
 
@@ -168,11 +165,10 @@ class BatchProcessor:
         logger.info(f"Processamento de batches concluido")
         return results
 
-
 class AsyncProcessor:
     """Processador assincrono de tarefas"""
 
-    def __init__(self, max_workers: Optional[int] = None):
+    def __init__(self, max_workers: int | None = None):
         """
         Inicializa processador assincrono
 
@@ -183,9 +179,9 @@ class AsyncProcessor:
 
     def process_tasks(
         self,
-        tasks: List[Callable],
+        tasks: list[Callable],
         use_processes: bool = False
-    ) -> List[Any]:
+    ) -> list[Any]:
         """
         Processa lista de tarefas assincronamente
 

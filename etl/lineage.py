@@ -3,16 +3,14 @@ Rastreamento de linhagem de dados (data lineage)
 """
 
 import json
-from typing import Dict, List, Any, Optional
+from typing import Any
 from datetime import datetime
 from pathlib import Path
 import hashlib
 
 from etl.logger import get_logger
 
-
 logger = get_logger('lineage')
-
 
 class DataLineageNode:
     """Representa um no na linhagem de dados"""
@@ -22,7 +20,7 @@ class DataLineageNode:
         node_id: str,
         node_type: str,
         name: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any | None] = None
     ):
         self.node_id = node_id
         self.node_type = node_type
@@ -30,7 +28,7 @@ class DataLineageNode:
         self.metadata = metadata or {}
         self.timestamp = datetime.now().isoformat()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Converte no para dicionario"""
         return {
             'node_id': self.node_id,
@@ -40,7 +38,6 @@ class DataLineageNode:
             'timestamp': self.timestamp
         }
 
-
 class DataLineageEdge:
     """Representa uma aresta (relacionamento) na linhagem"""
 
@@ -49,7 +46,7 @@ class DataLineageEdge:
         source_id: str,
         target_id: str,
         edge_type: str,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any | None] = None
     ):
         self.source_id = source_id
         self.target_id = target_id
@@ -57,7 +54,7 @@ class DataLineageEdge:
         self.metadata = metadata or {}
         self.timestamp = datetime.now().isoformat()
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Converte aresta para dicionario"""
         return {
             'source_id': self.source_id,
@@ -67,19 +64,18 @@ class DataLineageEdge:
             'timestamp': self.timestamp
         }
 
-
 class DataLineageTracker:
     """Rastreia linhagem de dados em pipeline ETL"""
 
-    def __init__(self, output_file: Optional[Path] = None):
+    def __init__(self, output_file: Path | None = None):
         """
         Inicializa tracker de linhagem
 
         Args:
             output_file: Arquivo para salvar linhagem
         """
-        self.nodes: Dict[str, DataLineageNode] = {}
-        self.edges: List[DataLineageEdge] = []
+        self.nodes: dict[str, DataLineageNode] = {}
+        self.edges: list[DataLineageEdge] = []
         self.output_file = output_file or Path('lineage/data_lineage.json')
         self.pipeline_id = self._generate_pipeline_id()
 
@@ -88,7 +84,7 @@ class DataLineageTracker:
         timestamp = datetime.now().isoformat()
         return hashlib.md5(timestamp.encode()).hexdigest()[:12]
 
-    def add_source(self, source_id: str, name: str, metadata: Optional[Dict] = None):
+    def add_source(self, source_id: str, name: str, metadata: dict | None = None):
         """
         Adiciona fonte de dados
 
@@ -106,7 +102,7 @@ class DataLineageTracker:
         self.nodes[source_id] = node
         logger.info(f"Fonte adicionada: {name}")
 
-    def add_transformation(self, transform_id: str, name: str, metadata: Optional[Dict] = None):
+    def add_transformation(self, transform_id: str, name: str, metadata: dict | None = None):
         """
         Adiciona transformacao
 
@@ -124,7 +120,7 @@ class DataLineageTracker:
         self.nodes[transform_id] = node
         logger.info(f"Transformacao adicionada: {name}")
 
-    def add_target(self, target_id: str, name: str, metadata: Optional[Dict] = None):
+    def add_target(self, target_id: str, name: str, metadata: dict | None = None):
         """
         Adiciona destino de dados
 
@@ -147,7 +143,7 @@ class DataLineageTracker:
         source_id: str,
         target_id: str,
         edge_type: str = 'flows_to',
-        metadata: Optional[Dict] = None
+        metadata: dict | None = None
     ):
         """
         Adiciona relacionamento entre nos
@@ -170,9 +166,9 @@ class DataLineageTracker:
     def track_pipeline_execution(
         self,
         source: str,
-        transformations: List[str],
+        transformations: list[str],
         target: str,
-        metadata: Optional[Dict] = None
+        metadata: dict | None = None
     ):
         """
         Rastreia execucao completa de pipeline
@@ -198,7 +194,7 @@ class DataLineageTracker:
         self.add_target(target_id, target, metadata)
         self.add_relationship(previous_id, target_id, 'loads_to')
 
-    def export_to_json(self) -> Dict[str, Any]:
+    def export_to_json(self) -> dict[str, Any]:
         """
         Exporta linhagem para JSON
 
