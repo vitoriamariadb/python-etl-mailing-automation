@@ -1,25 +1,25 @@
-# Pipeline ETL Avancado
+# Pipeline ETL Avançado
 
-Sistema ETL modular e extensivel para processamento de dados em larga escala.
+Sistema ETL modular e extensível para processamento de dados em larga escala.
 
-## Caracteristicas
+## Características
 
-- Suporte a multiplas fontes de dados (CSV, JSON, Excel, Parquet, PostgreSQL, MySQL)
+- Suporte a múltiplas fontes de dados (CSV, JSON, Excel, Parquet, PostgreSQL, MySQL)
 - Processamento paralelo e batch otimizado
-- Validacao de qualidade e schema
+- Validação de qualidade e schema
 - Carga incremental e CDC
 - Data lineage tracking
-- Sistema de checkpoint e recuperacao
-- Exportacao para multiplos formatos
+- Sistema de checkpoint e recuperação
+- Exportação para múltiplos formatos
 - Testes completos (80%+ cobertura)
 
-## Instalacao
+## Instalação
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Uso Basico
+## Uso Básico
 
 ### Pipeline Simples
 
@@ -38,7 +38,7 @@ print(f"Status: {result['status']}")
 print(f"Linhas processadas: {result['rows_processed']}")
 ```
 
-### Pipeline com Transformacoes
+### Pipeline com Transformações
 
 ```python
 from etl.orchestrator import ETLOrchestrator
@@ -59,7 +59,7 @@ result = orchestrator.execute(
 )
 ```
 
-### Validacao de Qualidade
+### Validação de Qualidade
 
 ```python
 from etl.quality import DataQualityValidator
@@ -76,7 +76,7 @@ report = validator.validate(df)
 print(f"Taxa de sucesso: {report['success_rate']:.1%}")
 ```
 
-### Validacao de Schema
+### Validação de Schema
 
 ```python
 from etl.schema import TableSchema, ColumnSchema, DataType
@@ -146,7 +146,7 @@ with connector.transaction():
     connector.insert_dataframe(df_processado, 'vendas_processadas')
 ```
 
-### Checkpoint e Recuperacao
+### Checkpoint e Recuperação
 
 ```python
 from etl.checkpoint import CheckpointManager, PipelineRecovery
@@ -184,7 +184,7 @@ tracker.save()
 print(tracker.visualize_graph())
 ```
 
-### Exportacao Multi-formato
+### Exportação Multi-formato
 
 ```python
 from etl.export import DataExporter
@@ -247,7 +247,7 @@ pytest tests/ -v
 pytest tests/ -v --cov=etl --cov-report=html
 ```
 
-### Testes especificos
+### Testes específicos
 
 ```bash
 pytest tests/test_integration.py -v
@@ -265,13 +265,13 @@ pytest tests/test_integration.py -v
 │   ├── orchestrator.py        # Orquestrador
 │   ├── pipeline.py            # Pipeline principal
 │   ├── incremental.py         # Carga incremental
-│   ├── quality.py             # Validacao qualidade
-│   ├── schema.py              # Validacao schema
+│   ├── quality.py             # Validação qualidade
+│   ├── schema.py              # Validação schema
 │   ├── parallel.py            # Processamento paralelo
 │   ├── lineage.py             # Data lineage
 │   ├── checkpoint.py          # Checkpoint/recovery
-│   ├── export.py              # Exportacao
-│   └── batch_optimizer.py     # Otimizacao batch
+│   ├── export.py              # Exportação
+│   └── batch_optimizer.py     # Otimização batch
 ├── tests/
 │   ├── test_integration.py
 │   ├── test_database.py
@@ -295,10 +295,10 @@ pytest tests/test_integration.py -v
 - Docker
 - pre-commit
 
-## Licenca
+## Licença
 
 MIT
 
 ## Contato
 
-Para duvidas ou sugestoes, abra uma issue.
+Para dúvidas ou sugestões, abra uma issue.
