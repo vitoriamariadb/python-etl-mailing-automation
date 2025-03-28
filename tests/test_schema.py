@@ -151,3 +151,4 @@ class TestSchema:
 
         assert schema.columns['col1'].nullable is True
         assert schema.columns['col2'].nullable is False
+
