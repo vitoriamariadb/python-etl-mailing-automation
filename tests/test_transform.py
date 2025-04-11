@@ -101,3 +101,4 @@ class TestDataTransformer:
 
         transformer.reset_tracking()
         assert len(transformer.transformations_applied) == 0
+
