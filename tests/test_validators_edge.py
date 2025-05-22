@@ -136,3 +136,4 @@ class TestValidatorEdgeCases:
         assert result["total_rules"] == 2
 
 # "A liberdade e o direito de fazer tudo o que as leis permitem." -- Montesquieu
+
