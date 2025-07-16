@@ -245,4 +245,3 @@ class StreamingBatchProcessor:
 
         logger.info(f"Streaming concluido: {len(results)} chunks processados")
         return results
-
