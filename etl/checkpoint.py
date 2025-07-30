@@ -271,4 +271,3 @@ class PipelineRecovery:
             data = step(data)
 
         return data
-
