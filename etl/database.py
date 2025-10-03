@@ -195,4 +195,3 @@ class DatabaseFactory:
             return MySQLConnector(**config)
         else:
             raise ValueError(f"Tipo de banco nao suportado: {db_type}")
-
