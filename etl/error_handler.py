@@ -115,4 +115,3 @@ def safe_execute(func: Callable, *args, default_value: Any = None, logger_instan
     except Exception as e:
         log.error(f"Erro ao executar {func.__name__}: {e}", exc_info=True)
         return default_value
-
