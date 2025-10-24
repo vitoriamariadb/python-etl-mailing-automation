@@ -33,4 +33,3 @@ class ConfigurationError(ETLBaseException):
 class DataQualityError(ETLBaseException):
     """Erro de qualidade de dados"""
     pass
-
