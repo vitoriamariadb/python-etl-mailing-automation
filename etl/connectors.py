@@ -2,11 +2,12 @@
 Conectores para diferentes fontes de dados
 """
 
-from abc import ABC, abstractmethod
 import logging
-import pandas as pd
+from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
