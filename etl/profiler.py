@@ -98,6 +98,7 @@ class DataProfile:
         }
 
 
+
 class DataProfiler:
     """Perfilador de dados com suporte a multiplas fontes."""
 
