@@ -220,6 +220,6 @@ class DataValidator:
             'results': self.validation_results
         }
 
-    def reset(self):
+    def reset(self) -> None:
         """Reseta resultados de validacao"""
         self.validation_results = []
