@@ -173,7 +173,11 @@ class DataProfiler:
         return profile
 
     def _generate_warnings(self, profile: DataProfile) -> None:
-        """Gera avisos automaticos baseados no perfil."""
+        """Gera avisos automaticos baseados no perfil.
+
+        Analisa colunas com alta taxa de nulos, valores constantes
+        e possíveis identificadores unicos.
+        """
         for col in profile.columns:
             if col.null_rate > 0.5:
                 profile.warnings.append(f"Coluna '{col.name}' tem {col.null_rate:.0%} de valores nulos")
