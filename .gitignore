@@ -57,3 +57,6 @@ htmlcov/
 *.key
 *.pem
 credentials.json
+
+# Linters
+.ruff_cache/
