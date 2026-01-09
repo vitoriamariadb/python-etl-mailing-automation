@@ -24,6 +24,7 @@ class BaseConnector(ABC):
         """Escreve dados no destino"""
         pass
 
+
 class FileConnector(BaseConnector):
     """Conector generico para arquivos"""
 
@@ -68,6 +69,7 @@ class FileConnector(BaseConnector):
             return True
         except Exception as e:
             raise RuntimeError(f"Erro ao escrever arquivo {self.file_type}: {e}")
+
 
 class DuckDBConnector(BaseConnector):
     """Conector para DuckDB - analytics local de alto desempenho."""
