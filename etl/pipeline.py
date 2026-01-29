@@ -206,3 +206,6 @@ class ETLPipeline:
             'avg_duration': avg_duration,
             'total_rows_processed': total_rows
         }
+
+
+# "A vida nao examinada nao vale a pena ser vivida." -- Socrates
