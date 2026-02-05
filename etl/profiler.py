@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Profiler Module
 Analise estatistica e perfilamento de dados para pipelines ETL.
