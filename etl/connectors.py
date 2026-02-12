@@ -28,7 +28,7 @@ class BaseConnector(ABC):
 class FileConnector(BaseConnector):
     """Conector generico para arquivos"""
 
-    def __init__(self, file_type: str):
+    def __init__(self, file_type: str) -> None:
         self.file_type = file_type
         self.readers = {
             'csv': pd.read_csv,
